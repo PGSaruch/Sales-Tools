@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Tools Portal</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem;
+      --color-bg:#f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-surface-offset:#f3f0ec;
+      --color-divider:#dcd9d5; --color-text:#28251d; --color-text-muted:#6f6d67; --color-text-inverse:#f9f8f4;
+      --color-primary:#01696f; --color-primary-hover:#0c4e54; --color-primary-highlight:#cedcd8;
+      --radius-md:.5rem; --radius-lg:.75rem; --radius-xl:1rem; --shadow-sm:0 1px 2px rgba(40,37,29,.06); --shadow-md:0 8px 24px rgba(40,37,29,.08);
+      --transition:180ms cubic-bezier(.16,1,.3,1); --font-body:'Satoshi','Inter',sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-surface-offset:#22211f;
+      --color-divider:#262523; --color-text:#cdccca; --color-text-muted:#9a9894; --color-text-inverse:#171614;
+      --color-primary:#4f98a3; --color-primary-hover:#66aab3; --color-primary-highlight:#313b3b;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.2); --shadow-md:0 12px 32px rgba(0,0,0,.35);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;background:linear-gradient(180deg,var(--color-bg),var(--color-surface-offset));color:var(--color-text);min-height:100dvh}
+    button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer;border:none} textarea{resize:vertical}
+    a,button,input,textarea,select{transition:all var(--transition)} :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px}
+    .shell{max-width:1280px;margin:0 auto;padding:var(--space-6)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)}
+    .title h1{font-size:var(--text-xl);line-height:1.1}.title p{color:var(--color-text-muted);font-size:var(--text-sm);margin-top:.35rem}
+    .theme-toggle{min-width:44px;min-height:44px;padding:.7rem;border-radius:999px;background:var(--color-surface);box-shadow:var(--shadow-sm)}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:var(--space-6)}
+    .sidebar,.panel{background:color-mix(in srgb,var(--color-surface) 92%,transparent);border:1px solid color-mix(in srgb,var(--color-text) 10%,transparent);border-radius:var(--radius-xl);box-shadow:var(--shadow-md)}
+    .sidebar{padding:var(--space-5);position:sticky;top:1rem;height:fit-content}
+    .menu{display:grid;gap:var(--space-3)}
+    .menu button{min-height:48px;padding:.9rem 1rem;text-align:left;border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid color-mix(in srgb,var(--color-text) 10%,transparent);font-weight:700}
+    .menu button.active{background:var(--color-primary);color:var(--color-text-inverse)}
+    .content{display:grid;gap:var(--space-6)}
+    .panel{padding:var(--space-6)}
+    .section{display:none}.section.active{display:block}
+    .section h2{font-size:var(--text-lg);margin-bottom:.35rem}.section > p{color:var(--color-text-muted);margin-bottom:var(--space-4);font-size:var(--text-sm)}
+    .field{display:grid;gap:.45rem;margin-bottom:var(--space-4);position:relative}
+    .field-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+    label,legend{font-size:var(--text-sm);font-weight:700}
+    input,textarea,select{width:100%;min-height:48px;padding:.9rem 1rem;border-radius:var(--radius-lg);background:var(--color-surface-2);border:1px solid color-mix(in srgb,var(--color-text) 12%,transparent)}
+    textarea{min-height:100px}
+    .btn-row,.chips{display:flex;flex-wrap:wrap;gap:.75rem}
+    .btn{min-height:44px;padding:.8rem 1rem;border-radius:var(--radius-lg);font-size:var(--text-sm);font-weight:700;border:1px solid transparent}
+    .btn-primary{background:var(--color-primary);color:var(--color-text-inverse)} .btn-primary:hover{background:var(--color-primary-hover)}
+    .btn-secondary{background:var(--color-surface);border-color:color-mix(in srgb,var(--color-text) 10%,transparent)}
+    .box{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-offset);border:1px solid color-mix(in srgb,var(--color-text) 10%,transparent)}
+    .preview{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:280px}
+    .customer-tool-wrap{display:grid;gap:var(--space-4)}
+    .customer-table-wrap{overflow:auto;border-radius:var(--radius-lg)}
+    .customer-table-wrap table{min-width:760px}
+    .customer-action-cell{white-space:nowrap;width:180px}
+    .customer-action-cell .btn-row{flex-wrap:nowrap}
+    .customer-table-wrap th{font-size:.88rem;letter-spacing:.01em}
+    .customer-table-wrap td{font-size:.9rem;line-height:1.45}
+    .customer-table-wrap .btn{padding:.55rem .8rem;min-height:38px;font-size:.82rem}
+    .helper{color:var(--color-text-muted);font-size:var(--text-xs)}
+    .chips label{display:flex;align-items:center;gap:.45rem;padding:.7rem .9rem;border-radius:999px;background:var(--color-surface-2);border:1px solid color-mix(in srgb,var(--color-text) 10%,transparent)}
+    .autocomplete{position:absolute;top:100%;left:0;right:0;z-index:20;margin-top:.35rem;background:var(--color-surface);border:1px solid color-mix(in srgb,var(--color-text) 10%,transparent);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);max-height:240px;overflow:auto;display:none}
+    .autocomplete.show{display:block}.option{padding:.85rem 1rem;border-bottom:1px solid var(--color-divider);cursor:pointer}.option:last-child{border-bottom:none}.option:hover,.option.active{background:color-mix(in srgb,var(--color-primary) 10%,var(--color-surface))}
+    .option-code{font-size:var(--text-xs);color:var(--color-primary);font-weight:700}.option-name{font-size:var(--text-sm)}
+    table{width:100%;border-collapse:collapse} th,td{padding:.85rem .75rem;border-bottom:1px solid var(--color-divider);text-align:left;vertical-align:top} th{font-size:var(--text-sm)} td{font-size:var(--text-sm)} .danger{background:#a13544;color:#fff} .danger:hover{background:#872b39}
+    @media (max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{position:static}}
+    @media (max-width:700px){.shell{padding:var(--space-4)}.field-grid-2{grid-template-columns:1fr}.btn-row{flex-direction:column}.btn{width:100%}.customer-table-wrap th{font-size:.76rem}.customer-table-wrap td{font-size:.78rem;line-height:1.35;padding:.7rem .55rem}.customer-table-wrap table{min-width:620px}.customer-action-cell{width:132px}.customer-action-cell .btn-row{gap:.45rem}.customer-table-wrap .btn{min-height:32px;padding:.42rem .55rem;font-size:.72rem;width:auto}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="title">
+        <h1>Sales Tools Portal</h1>
+        <p>รวมหลายเครื่องมือไว้ในเว็บเดียวแบบเมนูสารบัญหน้าเดียว</p>
+      </div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme"></button>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="menu">
+          <button class="menu-btn active" data-section="home">สารบัญ</button>
+          <button class="menu-btn" data-section="email-tool">Email Tool</button>
+          <button class="menu-btn" data-section="customer-tool">Customer Search</button>
+          <button class="menu-btn" data-section="report-tool">Meeting Report</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="panel section active" id="home">
+          <h2>สารบัญเครื่องมือ</h2>
+          <p>หน้าเดียวรวมทุกอย่างไว้แล้ว กดเมนูซ้ายเพื่อสลับใช้งานแต่ละเครื่องมือได้ทันที</p>
+          <div class="box">
+            <table>
+              <thead><tr><th>หมวด</th><th>รายละเอียด</th></tr></thead>
+              <tbody>
+                <tr><td>Email Tool</td><td>สร้าง Subject และข้อความอีเมลสำหรับคุยกับเทค พร้อม popup เลือกลูกค้าจาก customer name/code</td></tr>
+                <tr><td>Customer Search</td><td>ค้นหา customer code จากชื่อ หรือค้นหาชื่อลูกค้าจาก code ได้ในหน้าเดียว</td></tr>
+                <tr><td>Meeting Report</td><td>กรอกข้อมูลประชุมและสร้างข้อความสรุปแบบ report-ready ตามหัวข้อที่ใช้งานจริง</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel section" id="email-tool">
+          <h2>Email Tool</h2>
+          <p>สร้าง Subject และ body email สำหรับคุยกับเทค พร้อม autocomplete ลูกค้า</p>
+          <div class="field"><label for="formatType">ประเภทการคุยกับเทค</label><select id="formatType"><option value="identify">Code_Identify</option><option value="technical">Technical Inquiry</option></select></div>
+          <div class="field-grid-2">
+            <div class="field">
+              <label for="cuCodePrefix">Customer name / Customer code สำหรับ Subject</label>
+              <input id="cuCodePrefix" type="text" placeholder="พิมพ์ชื่อลูกค้าหรือโค้ด" autocomplete="off" />
+              <div id="customerPopup" class="autocomplete"></div>
+            </div>
+            <div class="field"><label for="itemCount">จำนวนรายการสินค้า (#Code)</label><input id="itemCount" type="number" min="1" step="1" value="1" /></div>
+          </div>
+          <div class="box" id="selectedCustomer">ยังไม่ได้เลือกลูกค้า</div>
+          <div class="field"><legend>กลุ่มสินค้าใน Subject</legend><div class="chips"><label><input type="checkbox" id="eco" checked /> ECO</label><label><input type="checkbox" id="std" /> STD</label></div></div>
+          <div class="field"><label for="subjectOrder">ลำดับกลุ่มสินค้า</label><select id="subjectOrder"><option value="eco-std">(ECO)(STD)</option><option value="std-eco">(STD)(ECO)</option></select></div>
+          <div class="box"><strong>Subject Preview</strong><div id="subjectPreview"></div></div>
+          <div class="field"><label for="dear">Dear</label><input id="dear" type="text" value="ME-TS TEAM" /></div>
+          <div class="field"><label for="intro">ข้อความเกริ่นก่อน Original Product Info</label><textarea id="intro">Please recommend and convert part list as ECO product.</textarea></div>
+          <div class="field"><label for="productCd">Product_CD :</label><input id="productCd" type="text" /></div>
+          <div class="field"><label for="productSpec">Product spec:</label><textarea id="productSpec"></textarea></div>
+          <div class="field"><label for="productName">Product Name:</label><input id="productName" type="text" /></div>
+          <div class="field"><label for="brand">Brand :</label><input id="brand" type="text" /></div>
+          <div class="field"><label for="cuCodeName">CU Code/Name :</label><input id="cuCodeName" type="text" /></div>
+          <div class="field"><label for="contact">Name/Tel :</label><input id="contact" type="text" /></div>
+          <div class="field"><label for="feedbackDate">CU request date for feedback :</label><input id="feedbackDate" type="text" /></div>
+          <div class="btn-row"><button class="btn btn-primary" type="button" id="copyEmailBtn">Copy Email</button><button class="btn btn-secondary" type="button" id="copySubjectBtn">Copy Subject</button><button class="btn btn-secondary" type="button" id="clearEmailBtn">Clear ข้อมูล</button></div>
+          <div class="box preview" id="emailPreview"></div>
+        </section>
+
+        <section class="panel section" id="customer-tool">
+          <h2>Customer Search</h2>
+          <p>ค้นหาได้ทั้งจาก code หรือ customer name พร้อมผลลัพธ์ใกล้เคียง</p>
+          <div class="customer-tool-wrap">
+            <div class="field-grid-2">
+              <div class="field"><label for="searchCode">Search by Code</label><input id="searchCode" type="text" placeholder="เช่น W00GKH หรือ 861295" /></div>
+              <div class="field"><label for="searchName">Search by Customer Name</label><input id="searchName" type="text" placeholder="เช่น A M S หรือ NISSIN" /></div>
+            </div>
+            <div class="box">
+              <div class="field-grid-2">
+                <div class="field"><label for="manageCode">CODE</label><input id="manageCode" type="text" placeholder="กรอก customer code" /></div>
+                <div class="field"><label for="manageName">CUSTOMER_NAME</label><input id="manageName" type="text" placeholder="กรอก customer name" /></div>
+              </div>
+              <div class="helper" style="margin-bottom:1rem;">เลือกจากตารางเพื่อแก้ไขได้, ลบจากปุ่มข้างรายการได้ทันที และระบบจะมี popup ยืนยันก่อนลบ</div>
+              <div class="btn-row">
+                <button class="btn btn-primary" type="button" id="addCustomerBtn">Add</button>
+                <button class="btn btn-secondary" type="button" id="updateCustomerBtn">Update</button>
+                <button class="btn btn-secondary danger" type="button" id="deleteCustomerBtn">Delete</button>
+                <button class="btn btn-secondary" type="button" id="exportCustomerBtn">Export CSV</button>
+                <button class="btn btn-secondary" type="button" id="clearCustomerManageBtn">Clear ฟอร์ม</button>
+                <button class="btn btn-secondary" type="button" id="clearCustomerSearchBtn">Clear ค้นหา</button>
+              </div>
+            </div>
+            <div class="box customer-table-wrap"><table><thead><tr><th>CODE</th><th>CUSTOMER_NAME</th><th>ACTION</th></tr></thead><tbody id="customerResults"></tbody></table></div>
+          </div><div id="customerConfirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;padding:1rem;align-items:center;justify-content:center;"><div style="max-width:480px;width:100%;background:var(--color-surface);color:var(--color-text);border-radius:var(--radius-xl);padding:1.25rem;border:1px solid color-mix(in srgb,var(--color-text) 12%,transparent);box-shadow:var(--shadow-md)"><h3 style="margin-bottom:.5rem;">ยืนยันการลบ</h3><p id="customerConfirmText" style="margin-bottom:1rem;color:var(--color-text-muted);"></p><div class="btn-row"><button class="btn btn-secondary" type="button" id="customerConfirmCancel">ยกเลิก</button><button class="btn danger" type="button" id="customerConfirmDelete">ลบรายการนี้</button></div></div></div>
+        </section>
+
+        <section class="panel section" id="report-tool">
+          <h2>Meeting Report</h2>
+          <p>กรอกข้อมูลแล้วสร้าง report-ready summary ในหน้าเดียว</p>
+          <div class="field"><label for="reportCustomer">Customer Name</label><input id="reportCustomer" type="text" /></div>
+          <div class="field"><label for="objectives">Objectives</label><textarea id="objectives"></textarea></div>
+          <div class="field"><label for="result">Result</label><textarea id="result"></textarea></div>
+          <div class="field"><label for="opportunities">Product Opportunities</label><textarea id="opportunities"></textarea></div>
+          <div class="field"><label for="projectName">Project Name</label><input id="projectName" type="text" /></div>
+          <div class="field-grid-2">
+            <div class="field"><label for="projectStatus">Project Status</label><input id="projectStatus" type="text" /></div>
+            <div class="field"><label for="enduser">Enduser</label><input id="enduser" type="text" /></div>
+          </div>
+          <div class="field-grid-2">
+            <div class="field"><label for="value">Value</label><input id="value" type="text" /></div>
+            <div class="field"><label for="competitor">Competitor</label><input id="competitor" type="text" /></div>
+          </div>
+          <div class="field"><label for="planOrder">Plan Order</label><input id="planOrder" type="text" /></div>
+          <div class="field"><label for="nextAction">Next Action</label><textarea id="nextAction"></textarea></div>
+          <div class="btn-row"><button class="btn btn-primary" type="button" id="generateReportBtn">สร้างสรุป</button><button class="btn btn-secondary" type="button" id="copyReportBtn">Copy Report</button><button class="btn btn-secondary" type="button" id="clearReportBtn">Clear ข้อมูล</button></div>
+          <div class="box preview" id="reportPreview"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let customerMaster = [
+      { code: 'W00GKH', name: 'A M S INTERPART CO.,LTD (HEAD OFFICE)' },
+      { code: '862564', name: 'AIT SERVICE CO.,LTD. (HEAD OFFICE)' },
+      { code: '861200', name: 'ALSYS (THAILAND) CO.,LTD. (HEAD OFFICE)' },
+      { code: 'W00B67', name: 'AMAZING DESIGN (THAILAND) CO.,LTD (HEAD OFFICE)' },
+      { code: 'W00I5C', name: 'AMD SOLUTION CO.,LTD. (HEAD OFFICE)' },
+      { code: 'W00DXQ', name: 'AUTOMATION NETWORK DESIGN CO.,LTD (HEAD OFFICE)' },
+      { code: '869401', name: 'BTS AUTOMATION ENGINEERING CO.,LTD.' },
+      { code: '862286', name: 'CLP ENGINEERING CO., LTD (HEAD OFFICE)' },
+      { code: '868091', name: 'COLIBRI AUTOMATION (THAILAND) CO.,LTD.' },
+      { code: '862751', name: 'CREFORM YAZAKI (THAILAND) CO., LTD.' },
+      { code: '00073X', name: 'D PROGRESS PLUS CO., LTD. (HEAD OFFICE)' },
+      { code: '868220', name: 'D2S PROFESSIONAL CO.,LTD. (HEAD OFFICE)' },
+      { code: '144252', name: 'DAISIN CO.,LTD. (HEAD OFFICE)' },
+      { code: '868771', name: 'DYNAMIC MECHATRONICS ENGINEERING CO.,LTD.' },
+      { code: 'W00DE4', name: 'EC MACHINE 99 CO.,LTD. (HEAD OFFICE)' },
+      { code: '869258', name: 'EIGHTDMOTION CO.,LTD' },
+      { code: '865006', name: 'FOCUZ MANUFACTURING CO., LTD. (HEAD OFFICE)' },
+      { code: '529125', name: 'FUJI ELECTRIC MANUFACTURING (THAILAND) CO.,LTD.(HEAD OFFICE)' },
+      { code: '860467', name: 'FUJI POLY (THAILAND) CO.,LTD (HEAD OFFICE)' },
+      { code: '861295', name: 'INTER TECH ENGINEERING CO.,LTD.' },
+      { code: '868830', name: 'ISHIKAWA PRECISION TOOLS CO.,LTD. (HEAD OFFICE)' },
+      { code: '867541', name: 'JGC (THAILAND) CO.,LTD.' },
+      { code: '860562', name: 'K AND N MECHATRONIC CO.,LTD (HEAD OFFICE)' },
+      { code: '868302', name: 'LDT MICRO PRECISION COMPANY LIMITED' },
+      { code: '527656', name: 'MP TOOLS TECHNOLOGY CO.,LTD. (HEAD OFFICE)' },
+      { code: '145780', name: 'MUSASHI AUTO PARTS CO.,LTD. (HEAD OFFICE)' },
+      { code: '527626', name: 'MY PART PRECISION CO.,LTD (HEAD OFFICE)' },
+      { code: '869183', name: 'NEO INTERTECH CO.,LTD.' },
+      { code: '145634', name: 'NIPPON GASKET (THAILAND) CO.,LTD. (HEAD OFFICE)' },
+      { code: '861067', name: 'NISSIN ELECTRIC (THAILAND) CO.,LTD. (HEAD OFFICE)' },
+      { code: '864527', name: 'NIXMA TECHNOLOGY CO.,LTD. (HEAD OFFICE)' },
+      { code: '862117', name: 'NOVA AUTOTECH CO., LTD. (HEAD OFFICE)' },
+      { code: '528208', name: 'PNP ALL CO.,LTD. (HEAD OFFICE)' },
+      { code: '863482', name: 'PROIMAGE AUTOMATION CO., LTD.' },
+      { code: '869181', name: 'SAHATOOLS CO.,LTD.' },
+      { code: '145035', name: 'SEIKO PRECISION (THAILAND) CO.,LTD.' },
+      { code: '861560', name: 'SIAM INTEGRATION SYSTEMS CO., LTD. (HEAD OFFICE)' },
+      { code: '861808', name: 'SIAM KUBOTA CORPORATION CO.,LTD.' },
+      { code: '863086', name: 'SIAM PRECISION COMPONENTS CO., LTD.' },
+      { code: 'W001PY', name: 'SUCCESS CENTER SUPPLY CO.,LTD (HEAD OFFICE)' },
+      { code: '865116', name: 'SUCCESS CORPORATION CO., LTD. (HEAD OFFICE)' },
+      { code: '860324', name: 'THAI ENGINEERING PRODUCTS CO.,LTD.' },
+      { code: '867969', name: 'TOPMOST TECHNOLOGY INNOVATION CO.,LTD. (HEAD OFFICE)' },
+      { code: '863051', name: 'TRD MECHANICAL TECHNOLOGY CO., LTD.' },
+      { code: 'W006DU', name: 'TUE AUTOMATION ENGINEERING CO.,LTD. (HEAD OFFICE)' },
+      { code: '867262', name: 'TW.ENGINEERING SPECIALIST CO.,LTD.(HEAD OFFICE)' },
+      { code: '146066', name: 'UACJ METAL COMPONENTS (THAILAND) CO.,LTD. (HEAD OFFICE)' },
+      { code: 'W00B42', name: 'VISCON TECHNOLOGY CO.,LTD (HEAD OFFICE)' },
+      { code: 'W003U5', name: 'VISS AUTO SYSTEMS CO.,LTD (HEAD OFFICE)' },
+      { code: '868658', name: 'YAMAHA ROBOTICS MANUFACTURING ASIA CO., LTD' },
+      { code: '869187', name: 'ZE TRUE AUTOMATION CO.,LTD. (HEAD OFFICE)' }
+    ];
+
+    const root = document.documentElement;
+    const themeToggle = document.querySelector('[data-theme-toggle]');
+    let currentTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    function setTheme(theme){currentTheme=theme;root.setAttribute('data-theme',theme);themeToggle.innerHTML=theme==='dark'?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>':'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';}
+    themeToggle.addEventListener('click',()=>setTheme(currentTheme==='dark'?'light':'dark')); setTheme(currentTheme);
+
+    document.querySelectorAll('.menu-btn').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.menu-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.section).classList.add('active');
+    }));
+
+    const normalize = t => t.toLowerCase().replace(/\s+/g,' ').trim();
+    const copyText = async text => { try { await navigator.clipboard.writeText(text); } catch(e) { const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } };
+
+    const cuCodePrefix=document.getElementById('cuCodePrefix'), customerPopup=document.getElementById('customerPopup'), selectedCustomer=document.getElementById('selectedCustomer');
+    let filteredCustomers=[], activeIndex=-1, chosenCustomer=null;
+    function searchCustomers(query){const q=normalize(query); if(!q) return []; return customerMaster.map(item=>{const code=normalize(item.code), name=normalize(item.name); let score=0; if(code.startsWith(q)) score+=5; if(name.startsWith(q)) score+=4; if(code.includes(q)) score+=3; if(name.includes(q)) score+=2; return {...item, score};}).filter(i=>i.score>0).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name)).slice(0,8);}
+    function renderPopup(items){filteredCustomers=items; customerPopup.innerHTML=items.map((item,index)=>`<div class="option ${index===activeIndex?'active':''}" data-index="${index}"><div class="option-code">${item.code}</div><div class="option-name">${item.name}</div></div>`).join(''); customerPopup.classList.toggle('show',items.length>0);}
+    function chooseCustomer(item){chosenCustomer=item; cuCodePrefix.value=item.name; selectedCustomer.textContent=`${item.code} / ${item.name}`; document.getElementById('cuCodeName').value=`${item.code} / ${item.name}`; customerPopup.classList.remove('show'); updateEmailPreview();}
+    cuCodePrefix.addEventListener('input',()=>{const q=cuCodePrefix.value.trim(); if(!q){filteredCustomers=[]; chosenCustomer=null; activeIndex=-1; selectedCustomer.textContent='ยังไม่ได้เลือกลูกค้า'; customerPopup.classList.remove('show'); updateEmailPreview(); return;} const items=searchCustomers(q); activeIndex=items.length?0:-1; renderPopup(items); const exact=customerMaster.find(i=>normalize(i.name)===normalize(q)||normalize(i.code)===normalize(q)); if(!exact) chosenCustomer=null; updateEmailPreview();});
+    cuCodePrefix.addEventListener('keydown',e=>{if(!filteredCustomers.length) return; if(e.key==='ArrowDown'){e.preventDefault(); activeIndex=(activeIndex+1)%filteredCustomers.length; renderPopup(filteredCustomers);} else if(e.key==='ArrowUp'){e.preventDefault(); activeIndex=(activeIndex-1+filteredCustomers.length)%filteredCustomers.length; renderPopup(filteredCustomers);} else if(e.key==='Enter'){e.preventDefault(); if(activeIndex>=0) chooseCustomer(filteredCustomers[activeIndex]);} else if(e.key==='Escape'){customerPopup.classList.remove('show');}});
+    customerPopup.addEventListener('mousedown',e=>{const option=e.target.closest('.option'); if(!option) return; chooseCustomer(filteredCustomers[Number(option.dataset.index)]);});
+    document.addEventListener('click',e=>{if(!e.target.closest('#cuCodePrefix')&&!e.target.closest('#customerPopup')) customerPopup.classList.remove('show');});
+
+    function currentCustomerCode(){ if(chosenCustomer) return chosenCustomer.code; const raw=cuCodePrefix.value.trim(); const exact=customerMaster.find(i=>normalize(i.name)===normalize(raw)||normalize(i.code)===normalize(raw)); return exact?exact.code:raw; }
+    function subjectGroups(){ const order=document.getElementById('subjectOrder').value==='std-eco'?['STD','ECO']:['ECO','STD']; return order.filter(g=>g==='ECO'?document.getElementById('eco').checked:document.getElementById('std').checked); }
+    function composeSubject(){ const prefix=currentCustomerCode(), count=document.getElementById('itemCount').value.trim()||'1', mode=document.getElementById('formatType').value, groups=subjectGroups().map(g=>`(${g})`).join(''), tail=mode==='technical'?'Technical Inquiry':'Code_Identify'; return `(${prefix})${groups}_${tail}#Code=${count}`; }
+    function composeEmail(){ return ['Subject : '+composeSubject(),'','Dear '+document.getElementById('dear').value.trim(),'',document.getElementById('intro').value.trim(),'','Original Product Info','Product_CD : '+document.getElementById('productCd').value.trim(),'Product spec: '+document.getElementById('productSpec').value.trim(),'Product Name: '+document.getElementById('productName').value.trim(),'Brand : '+document.getElementById('brand').value.trim(),'CU Code/Name : '+document.getElementById('cuCodeName').value.trim(),'Name/Tel : '+document.getElementById('contact').value.trim(),'CU request date for feedback : '+document.getElementById('feedbackDate').value.trim()].join('\n'); }
+    function updateEmailPreview(){ document.getElementById('subjectPreview').textContent=composeSubject(); document.getElementById('emailPreview').textContent=composeEmail(); }
+    ['formatType','itemCount','eco','std','subjectOrder','dear','intro','productCd','productSpec','productName','brand','cuCodeName','contact','feedbackDate'].forEach(id=>{const el=document.getElementById(id); const ev=(el.type==='checkbox'||el.tagName==='SELECT')?'change':'input'; el.addEventListener(ev,updateEmailPreview); if(ev!=='input') el.addEventListener('input',updateEmailPreview);});
+    document.getElementById('copyEmailBtn').addEventListener('click',()=>copyText(composeEmail()));
+    document.getElementById('copySubjectBtn').addEventListener('click',()=>copyText(composeSubject()));
+
+    document.getElementById('clearEmailBtn').addEventListener('click',()=>{
+      document.getElementById('formatType').value='identify';
+      document.getElementById('cuCodePrefix').value='';
+      document.getElementById('itemCount').value='1';
+      document.getElementById('eco').checked=true;
+      document.getElementById('std').checked=false;
+      document.getElementById('subjectOrder').value='eco-std';
+      document.getElementById('dear').value='ME-TS TEAM';
+      document.getElementById('intro').value='Please recommend and convert part list as ECO product.';
+      document.getElementById('productCd').value='';
+      document.getElementById('productSpec').value='';
+      document.getElementById('productName').value='';
+      document.getElementById('brand').value='';
+      document.getElementById('cuCodeName').value='';
+      document.getElementById('contact').value='';
+      document.getElementById('feedbackDate').value='';
+      chosenCustomer=null;
+      filteredCustomers=[];
+      activeIndex=-1;
+      selectedCustomer.textContent='ยังไม่ได้เลือกลูกค้า';
+      customerPopup.classList.remove('show');
+      updateEmailPreview();
+    });
+
+    const customerResults=document.getElementById('customerResults');
+    const manageCode=document.getElementById('manageCode');
+    const manageName=document.getElementById('manageName');
+    const searchCodeInput=document.getElementById('searchCode');
+    const searchNameInput=document.getElementById('searchName');
+
+    const customerConfirmModal = document.getElementById('customerConfirmModal');
+    const customerConfirmText = document.getElementById('customerConfirmText');
+    const customerConfirmCancel = document.getElementById('customerConfirmCancel');
+    const customerConfirmDelete = document.getElementById('customerConfirmDelete');
+    let pendingDeleteCode = '';
+
+    function renderCustomerTable(items){
+      customerResults.innerHTML = items.map(i => `
+        <tr>
+          <td>${i.code}</td>
+          <td>${i.name}</td>
+          <td class="customer-action-cell">
+            <div class="btn-row">
+              <button class="btn btn-secondary load-customer-btn" type="button" data-code="${i.code}">Load</button>
+              <button class="btn danger row-delete-customer-btn" type="button" data-code="${i.code}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="3">ไม่พบข้อมูล</td></tr>';
+    }
+
+    function openDeleteModal(code){
+      const target = customerMaster.find(i => normalize(i.code) === normalize(code));
+      if(!target) return;
+      pendingDeleteCode = target.code;
+      customerConfirmText.textContent = `ลบรายการ ${target.code} / ${target.name} ใช่หรือไม่?`;
+      customerConfirmModal.style.display = 'flex';
+    }
+
+    function closeDeleteModal(){
+      pendingDeleteCode = '';
+      customerConfirmModal.style.display = 'none';
+    }
+
+    function getFilteredCustomers(){
+      const codeQ = normalize(searchCodeInput.value);
+      const nameQ = normalize(searchNameInput.value);
+      return customerMaster.filter(item => {
+        const matchCode = !codeQ || normalize(item.code).includes(codeQ);
+        const matchName = !nameQ || normalize(item.name).includes(nameQ);
+        return matchCode && matchName;
+      });
+    }
+
+    function updateCustomerSearch(){
+      renderCustomerTable(getFilteredCustomers());
+    }
+
+    function clearCustomerManage(){
+      manageCode.value='';
+      manageName.value='';
+    }
+
+    function syncAfterCustomerChange(changedCode=''){
+      updateCustomerSearch();
+      const currentInput = cuCodePrefix.value.trim();
+      if (chosenCustomer) {
+        const refreshed = customerMaster.find(i => normalize(i.code) === normalize(chosenCustomer.code));
+        if (refreshed) {
+          chosenCustomer = refreshed;
+          selectedCustomer.textContent = `${refreshed.code} / ${refreshed.name}`;
+          document.getElementById('cuCodeName').value = `${refreshed.code} / ${refreshed.name}`;
+          if (normalize(currentInput) === normalize(changedCode) || normalize(currentInput) === normalize(refreshed.name)) {
+            cuCodePrefix.value = refreshed.name;
+          }
+        } else {
+          chosenCustomer = null;
+          selectedCustomer.textContent = 'ยังไม่ได้เลือกลูกค้า';
+          document.getElementById('cuCodeName').value = '';
+          if (changedCode) cuCodePrefix.value = '';
+        }
+      }
+      updateEmailPreview();
+    }
+
+    function exportCustomerCsv(){
+      const rows = ['CODE,CUSTOMER_NAME', ...customerMaster.map(i => `"${i.code}","${i.name.replace(/"/g,'""')}"`)];
+      const blob = new Blob([rows.join('\n')], { type:'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'customer-master.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    searchCodeInput.addEventListener('input', updateCustomerSearch);
+    searchNameInput.addEventListener('input', updateCustomerSearch);
+
+    document.getElementById('clearCustomerSearchBtn').addEventListener('click',()=>{
+      searchCodeInput.value='';
+      searchNameInput.value='';
+      updateCustomerSearch();
+    });
+
+    document.getElementById('clearCustomerManageBtn').addEventListener('click', clearCustomerManage);
+    document.getElementById('exportCustomerBtn').addEventListener('click', exportCustomerCsv);
+
+    document.getElementById('addCustomerBtn').addEventListener('click',()=>{
+      const code=manageCode.value.trim();
+      const name=manageName.value.trim();
+      if(!code||!name){ alert('กรุณากรอก CODE และ CUSTOMER_NAME'); return; }
+      const exists=customerMaster.some(i=>normalize(i.code)===normalize(code));
+      if(exists){ alert('CODE นี้มีอยู่แล้ว กรุณาใช้ Update แทน'); return; }
+      customerMaster = [{ code, name }, ...customerMaster];
+      clearCustomerManage();
+      syncAfterCustomerChange(code);
+    });
+
+    document.getElementById('updateCustomerBtn').addEventListener('click',()=>{
+      const code=manageCode.value.trim();
+      const name=manageName.value.trim();
+      if(!code||!name){ alert('กรุณากรอก CODE และ CUSTOMER_NAME'); return; }
+      const idx=customerMaster.findIndex(i=>normalize(i.code)===normalize(code));
+      if(idx===-1){ alert('ไม่พบ CODE นี้ในระบบ'); return; }
+      customerMaster[idx] = { code, name };
+      clearCustomerManage();
+      syncAfterCustomerChange(code);
+    });
+
+    function deleteCustomerByCode(code){
+      const idx=customerMaster.findIndex(i=>normalize(i.code)===normalize(code));
+      if(idx===-1){ alert('ไม่พบ CODE นี้ในระบบ'); return; }
+      customerMaster.splice(idx,1);
+      clearCustomerManage();
+      syncAfterCustomerChange(code);
+      closeDeleteModal();
+    }
+
+    document.getElementById('deleteCustomerBtn').addEventListener('click',()=>{
+      const code=manageCode.value.trim();
+      if(!code){ alert('กรุณาเลือกหรือกรอก CODE ที่ต้องการลบ'); return; }
+      openDeleteModal(code);
+    });
+
+    customerResults.addEventListener('click',e=>{
+      const loadBtn=e.target.closest('.load-customer-btn');
+      if(loadBtn){
+        const item=customerMaster.find(i=>i.code===loadBtn.dataset.code);
+        if(!item) return;
+        manageCode.value=item.code;
+        manageName.value=item.name;
+        return;
+      }
+      const deleteBtn=e.target.closest('.row-delete-customer-btn');
+      if(deleteBtn){
+        openDeleteModal(deleteBtn.dataset.code);
+      }
+    });
+
+    customerConfirmCancel.addEventListener('click', closeDeleteModal);
+    customerConfirmModal.addEventListener('click', e=>{ if(e.target===customerConfirmModal) closeDeleteModal(); });
+    customerConfirmDelete.addEventListener('click', ()=>{ if(pendingDeleteCode) deleteCustomerByCode(pendingDeleteCode); });
+
+    updateCustomerSearch();
+
+    function composeReport(){ return ['Customer Name: '+document.getElementById('reportCustomer').value.trim(),'','1. Objectives',document.getElementById('objectives').value.trim(),'','2. Result',document.getElementById('result').value.trim(),'','3. Product Opportunities',document.getElementById('opportunities').value.trim(),'','4. Projects Detail','Project Name: '+document.getElementById('projectName').value.trim(),'Project Status: '+document.getElementById('projectStatus').value.trim(),'Enduser: '+document.getElementById('enduser').value.trim(),'Value: '+document.getElementById('value').value.trim(),'Competitor: '+document.getElementById('competitor').value.trim(),'Plan Order: '+document.getElementById('planOrder').value.trim(),'','5. Next Action',document.getElementById('nextAction').value.trim()].join('\n'); }
+    function updateReport(){ document.getElementById('reportPreview').textContent=composeReport(); }
+    ['reportCustomer','objectives','result','opportunities','projectName','projectStatus','enduser','value','competitor','planOrder','nextAction'].forEach(id=>document.getElementById(id).addEventListener('input',updateReport));
+    document.getElementById('generateReportBtn').addEventListener('click',updateReport); document.getElementById('copyReportBtn').addEventListener('click',()=>copyText(composeReport()));
+    document.getElementById('clearReportBtn').addEventListener('click',()=>{
+      ['reportCustomer','objectives','result','opportunities','projectName','projectStatus','enduser','value','competitor','planOrder','nextAction'].forEach(id=>document.getElementById(id).value='');
+      updateReport();
+    });
+
+    updateEmailPreview(); updateReport();
+  </script>
+</body>
+</html>
